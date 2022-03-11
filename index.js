@@ -33,6 +33,7 @@ async function run() {
         console.log('successfully connected with server!!');
         const database = client.db("BaristawayDB");
         const productsCollection = database.collection("products");
+        const ordersCollection = database.collection("orders");
 
 
         //-------------------------- Product API ------------------------------//
@@ -49,6 +50,35 @@ async function run() {
             const product = req.body;
             console.log(product);
             const result = await productsCollection.insertOne(product);
+            console.log(result);
+            res.json(result)
+        });
+        //-------------------------- Orders API ------------------------------//
+
+
+        // GET API 
+
+        app.get('/orders', async (req, res) => {
+            const cursor = ordersCollection.find({});
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+
+        // GET API for any specific Order
+
+        app.get('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const order = await ordersCollection.findOne(query);
+            console.log('load booking with id: ', id);
+            res.send(order);
+        });
+
+        //POST API
+        app.post('/orders', async (req, res) => {
+            const order = req.body;
+            console.log(order);
+            const result = await ordersCollection.insertOne(order);
             console.log(result);
             res.json(result)
         });
